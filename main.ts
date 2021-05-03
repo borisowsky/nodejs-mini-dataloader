@@ -7,7 +7,6 @@ class MiniDataLaoder {
     key: DataLoaderKey;
     resolve: DataLoaderResolver;
   }> = new Set();
-  private cachedResolvedPromise = Promise.resolve();
 
   constructor(batchLoaderFn: (keys: DataLoaderKey[]) => Promise<any>) {
     this.batchLoaderFn = batchLoaderFn;
@@ -35,9 +34,7 @@ class MiniDataLaoder {
     const promisedValue = new Promise((resolve) => {
       this.queue.add({ key, resolve });
 
-      this.cachedResolvedPromise.then(() => {
-        process.nextTick(this.dispatchQueue);
-      });
+      queueMicrotask(this.dispatchQueue);
     });
 
     return promisedValue;
