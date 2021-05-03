@@ -1,0 +1,17 @@
+{
+  "name": "mini-dataloader",
+  "version": "1.0.0",
+  "main": "main.ts",
+  "license": "MIT",
+  "scripts": {
+    "start": "tsnd --respawn ."
+  },
+  "devDependencies": {
+    "prettier": "^2.2.1",
+    "ts-node-dev": "^1.1.6"
+  },
+  "dependencies": {
+    "@types/node": "^15.0.1",
+    "typescript": "^4.2.4"
+  }
+}
