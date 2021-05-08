@@ -4,9 +4,14 @@
   "main": "main.ts",
   "license": "MIT",
   "scripts": {
-    "start": "tsnd --respawn ."
+    "start": "tsnd --respawn .",
+    "test": "jest"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.14.1",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/jest": "^26.0.23",
+    "jest": "^26.6.3",
     "prettier": "^2.2.1",
     "ts-node-dev": "^1.1.6"
   },
