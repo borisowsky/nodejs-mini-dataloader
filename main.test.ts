@@ -3,7 +3,7 @@ import type { DataLoaderKey } from './main';
 
 const asyncLoaderImplementation = (keys: DataLoaderKey[]) => {
   return new Promise((resolve) => {
-    queueMicrotask(() => resolve(keys.map((key) => key ** 2)));
+    setTimeout(() => resolve(keys.map((key) => key ** 2)), 100);
   });
 };
 
