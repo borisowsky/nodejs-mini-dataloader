@@ -1,21 +1,40 @@
-import { MiniDataLaoder } from './main';
-import type { DataLoaderKey } from './main';
+import { MiniDataLoader } from './main';
 
-const asyncLoaderImplementation = (keys: DataLoaderKey[]) => {
+const asyncMockFn = (keys: number[]) => {
   return new Promise((resolve) => {
-    queueMicrotask(() => resolve(keys.map((key) => key ** 2)));
+    setTimeout(() => {
+      resolve(keys.map((key) => key ** 2));
+    }, 200);
   });
 };
 
-describe('MiniDataLaoder', () => {
-  it('Should be executed `n` times due to `n` ticks', async () => {
-    const asyncLoader = jest.fn().mockImplementation(asyncLoaderImplementation);
-    const loader = new MiniDataLaoder(asyncLoader);
+describe('MiniDataLoader', () => {
+  it('Should be executed 1 time with multiple load calls', async () => {
+    const batchLoaderFn = jest.fn().mockImplementation(asyncMockFn);
+    const loader = new MiniDataLoader(batchLoaderFn);
 
-    await Promise.all([loader.load(1), loader.load(2), loader.load(3)]);
-    await Promise.all([loader.load(1), loader.load(2), loader.load(3)]);
-    await Promise.all([loader.load(1), loader.load(2), loader.load(3)]);
+    await Promise.all([
+      loader.load(1),
+      loader.load(2),
+      loader.load(3),
+      loader.load(4),
+    ]);
 
-    expect(asyncLoader).toHaveBeenCalledTimes(3);
+    expect(batchLoaderFn).toHaveBeenCalledTimes(1);
+  });
+
+  it('Should be executed with different keys on each tick', async () => {
+    const batchLoaderFn = jest.fn().mockImplementation(asyncMockFn);
+    const loader = new MiniDataLoader(batchLoaderFn);
+
+    const callArgs1 = [1, 2, 3];
+    const callArgs2 = [4, 5, 6];
+
+    await Promise.all(callArgs1.map(loader.load));
+    expect(batchLoaderFn).toHaveBeenCalledWith(callArgs1);
+
+    await Promise.all(callArgs2.map(loader.load));
+    expect(batchLoaderFn).toHaveBeenCalledWith(callArgs2);
   });
 });
+

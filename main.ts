@@ -1,23 +1,15 @@
-export type DataLoaderKey = number;
-type DataLoaderResolver = (value: unknown) => void;
 
-export class MiniDataLaoder {
-  private batchLoaderFn: (keys: DataLoaderKey[]) => Promise<any>;
-  private queue: Set<{
-    key: DataLoaderKey;
-    resolve: DataLoaderResolver;
-  }> = new Set();
+export class MiniDataLoader<K, V> {
+  private queue = new Set();
 
-  constructor(batchLoaderFn: (keys: DataLoaderKey[]) => Promise<any>) {
-    this.batchLoaderFn = batchLoaderFn;
-  }
+  constructor(private batchLoaderFn: (keys: K[]) => Promise<V>) {}
 
   dispatchQueue = () => {
     const keysArray = Array.from(this.queue);
     this.queue = new Set();
 
     if (keysArray.length > 0) {
-      this.batchLoaderFn(keysArray.map((k) => k.key)).then((values) => {
+      this.batchLoaderFn(keysArray.map(({ key }) => key)).then((values) => {
         keysArray.forEach(({ resolve }, i: number) => {
           resolve(values[i]);
         });
@@ -25,13 +17,10 @@ export class MiniDataLaoder {
     }
   };
 
-  load(key: DataLoaderKey) {
-    const promisedValue = new Promise((resolve) => {
+  load = (key: K): Promise<V> => {
+    return new Promise((resolve) => {
       this.queue.add({ key, resolve });
-
-      queueMicrotask(this.dispatchQueue);
+      queueMicrotask(() => process.nextTick(this.dispatchQueue));
     });
-
-    return promisedValue;
   }
 }
