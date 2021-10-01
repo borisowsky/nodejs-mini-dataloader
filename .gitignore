@@ -1,1 +1,7 @@
+# Dependecies
 /node_modules
+
+# Editors
+/.atom
+/.idea
+/.vscode
